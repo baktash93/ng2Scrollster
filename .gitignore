@@ -1,0 +1,8 @@
+node_modules
+**/*.log
+
+# Typescript files
+
+*.js
+*.map
+*.d.ts
