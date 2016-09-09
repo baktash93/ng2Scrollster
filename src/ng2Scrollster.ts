@@ -1,7 +1,7 @@
 import {Component, ViewChild, OnInit, ElementRef, Input} from "@angular/core";
 
 @Component({
-    selector: '[scrollster]',
+    selector: '[ng-scrollster]',
     template: `
     <div #contentWrapper class="content-wrapper">
         <div #scrollableContent class="scrollable-content">
