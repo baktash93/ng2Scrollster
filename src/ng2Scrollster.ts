@@ -17,6 +17,7 @@ import {Component, ViewChild, OnInit, ElementRef, Input} from "@angular/core";
             overflow: hidden;
         }
         .scrollable-content {
+            display: inline-block;
             top: 0;
             position: relative;
         }
@@ -27,8 +28,8 @@ import {Component, ViewChild, OnInit, ElementRef, Input} from "@angular/core";
             opacity: 0.7;
         }
         .scroll-bar-h {
-            right: 2px;
-            height: 5px;
+            bottom: 2px;
+            height: 6px;
             border-radius: 3px;
         }
         .scroll-bar-v {
@@ -79,7 +80,7 @@ export class Ng2Scrollster implements OnInit {
                 this.setTop(target, 0);
                 return;
             } else if ((parseInt(target.offsetHeight) - Math.abs(scrollableDistance)) <= parseInt(this.contentWrapper.clientHeight)) {
-                this.setTop(target, -1 * (parseInt(target.offsetHeight) - parseInt(this.contentWrapper.offsetHeight)) - 16);
+                this.setTop(target, -1 * (parseInt(target.offsetHeight) - parseInt(this.contentWrapper.offsetHeight)));
                 return;
             }
             this.setTop(target, scrollableDistance);
@@ -103,7 +104,7 @@ export class Ng2Scrollster implements OnInit {
                 this.setTop(target, 0);
                 return;
             } else if ((parseInt(target.offsetHeight) - Math.abs(distance)) <= parseInt(this.contentWrapper.clientHeight)) {
-                this.setTop(target, -1 * (parseInt(target.offsetHeight) - parseInt(this.contentWrapper.offsetHeight)) - 16);
+                this.setTop(target, -1 * (parseInt(target.offsetHeight) - parseInt(this.contentWrapper.offsetHeight)));
                 return;
             }
             this.setTop(target, distance);
@@ -128,7 +129,7 @@ export class Ng2Scrollster implements OnInit {
         el.style.top = top;
     }
 
-    initHorizontalScroll () : void {
+    initVerticalScroll () : void {
         let isScrollable;
 
         setTimeout(() => {
@@ -143,6 +144,23 @@ export class Ng2Scrollster implements OnInit {
             this.initBarCSS();
             this.initBarDrag();
             this.initScrollables();
+        }, 1);
+    }
+
+    initHorizontalScroll () : void {
+        let isScrollable;
+
+        setTimeout(() => {
+            let barLength = parseInt(this.contentWrapper.clientWidth) /
+                parseFloat(this.scrollableContent.clientWidth) * parseInt(this.contentWrapper.clientWidth);
+
+            isScrollable = barLength < this.contentWrapper.clientWidth ? true : false;
+
+            if(!isScrollable) return;
+            this.scrollBarH.style.width = barLength;
+
+            this.initContentCSS();
+            this.initBarCSS();
         }, 1);
     }
 
@@ -176,20 +194,25 @@ export class Ng2Scrollster implements OnInit {
 
     private initContentCSS() : void {
         this.contentWrapper.style.paddingRight = this.scrollBarV.offsetWidth;
+        this.contentWrapper.style.paddingBottom = this.scrollBarH.offsetHeight;
     }
 
     private watchScrollableContent() : void {
-        let initialHeight = this.scrollableContent.offsetHeight;
+        let initialHeight = this.scrollableContent.offsetHeight,
+            initialWidth = this.scrollableContent.offsetWidth;
         this.contentWrapper.addEventListener('sizeChange', (e) => {
+            this.initVerticalScroll();
             this.initHorizontalScroll();
         });
 
         setInterval(() => {
             let sizeChangeEvent = new Event('sizeChange');
-            let currentHeight = this.scrollableContent.offsetHeight;
+            let currentHeight = this.scrollableContent.offsetHeight,
+                currentWidth = this.scrollableContent.offsetWidth;
 
-            if(initialHeight !== this.scrollableContent.offsetHeight){
+            if(initialHeight !== this.scrollableContent.offsetHeight || initialWidth !== this.scrollableContent.offsetWidth){
                 initialHeight = currentHeight;
+                initialWidth = currentWidth;
                 this.contentWrapper.dispatchEvent(sizeChangeEvent);
             }
         }, 500);
@@ -221,6 +244,7 @@ export class Ng2Scrollster implements OnInit {
         this.contentWrapper = this.contentWrapperRef.nativeElement;
         this.scrollBarV = this.scrollBarVRef.nativeElement;
         this.scrollBarH = this.scrollBarHRef.nativeElement;
+        this.initVerticalScroll();
         this.initHorizontalScroll();
         this.watchScrollableContent();
         this.setContainerHeight();
