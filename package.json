@@ -15,5 +15,28 @@
   },
   "devDependencies": {
     "typescript": "^1.8.10"
-  }
+  },
+  "description": "Minimal, customizable scrollbar component for Angular2 apps.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baktash93/ng2Scrollster.git"
+  },
+  "keywords": [
+    "Angular2",
+    "angular",
+    "slim",
+    "scroll",
+    "ng2",
+    "scroll",
+    "ng2-scroll",
+    "ng2scrollbar",
+    "scrollbar",
+    "ng2"
+  ],
+  "author": "Ahmad Baktash Hayeri <baktash93@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/baktash93/ng2Scrollster/issues"
+  },
+  "homepage": "https://github.com/baktash93/ng2Scrollster#readme"
 }
