@@ -178,29 +178,23 @@ export class Ng2Scrollster implements OnInit {
         let isScrollable;
 
         setTimeout(() => {
+            this.scrollableContent.style.width = 'unset';
 
             let barLength = parseInt(this.contentWrapper.offsetWidth) /
                 parseInt(this.scrollableContent.offsetWidth) * parseInt(this.contentWrapper.offsetWidth);
 
             isScrollable = barLength < this.contentWrapper.clientWidth ? true : false;
-            console.log('ratio', parseInt(this.contentWrapper.offsetWidth) /
-                parseInt(this.scrollableContent.offsetWidth));
-            console.log('barLength ', barLength);
-            console.log('scrollableContent', this.scrollableContent.offsetWidth);
-            console.log('contentWrapper' , this.contentWrapper.clientWidth);
-            console.log('isScrollable', isScrollable);
 
             if(!isScrollable) {
-                // this.scrollableContent.style.width = '100%';
+                this.scrollableContent.style.width = '100%';
+                this.scrollableContent.style.left = '0px';
+                this.scrollBarH.style.width = 'unset';
                 return;
             }
-            //
-            this.scrollableContent.style.width = 'unset';
+
             this.scrollBarH.style.width = barLength;
             this.initHBarDrag();
-            // this.initContentCSS();
             this.initBarCSS();
-
         }, 1);
     }
 
@@ -219,10 +213,10 @@ export class Ng2Scrollster implements OnInit {
             e.preventDefault();
             e.stopPropagation();
             if(!isBarDragging) return;
-            console.log(e);
+
             let mouseInnerPosX = e.pageX - this.contentWrapper.offsetLeft;
             let currentPosX = mouseInnerPosX - .5 * this.scrollBarH.offsetWidth;
-            console.log(currentPosX);
+
 
             this.dragContentH(this.scrollBarH, currentPosX, true);
             this.dragContentH(this.scrollableContent, -(currentPosX * (this.scrollableContent.clientWidth/this.contentWrapper.clientWidth)), false);
