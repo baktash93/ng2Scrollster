@@ -11,15 +11,15 @@ Installation
     
 #### SystemJS configuration:
 
-  var maps = {
-    ...
-    'ng2-scrollster' : 'node_modules/ng2-scrollster'
-  };
-  
-  var packages = {
-    ...
-    'ng2-scrollster' : { main: 'index.js', defaultExtension: 'js' }
-  };
+      var maps = {
+        ...
+        'ng2-scrollster' : 'node_modules/ng2-scrollster'
+      };
+      
+      var packages = {
+        ...
+        'ng2-scrollster' : { main: 'index.js', defaultExtension: 'js' }
+      };
     
     
 Usage
