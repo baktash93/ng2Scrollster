@@ -87,7 +87,7 @@ export class Ng2Scrollster implements OnInit {
         }
     }
 
-    private dragContent(target, distance, isTargetRelativeToBoundary) : void {
+    private dragContentV(target, distance, isTargetRelativeToBoundary) : void {
         if(isTargetRelativeToBoundary){
             let scrollLimit = this.contentWrapper.clientHeight - this.scrollBarV.offsetHeight;
             if(distance <= 0) {
@@ -111,6 +111,30 @@ export class Ng2Scrollster implements OnInit {
         }
     }
 
+    private dragContentH(target, distance, isTargetRelativeToBoundary) : void {
+            if(isTargetRelativeToBoundary){
+                let dragLimit = this.contentWrapper.clientWidth - this.scrollBarH.offsetWidth;
+                if(distance <= 0) {
+                    this.setLeft(target, 0);
+                    return;
+                }
+                else if ((target.offsetWidth + distance) >= this.contentWrapper.clientWidth) {
+                    this.setLeft(target, dragLimit);
+                    return;
+                }
+                this.setLeft(target, distance);
+            } else {
+            if(distance >= 0) {
+                this.setLeft(target, 0);
+                return;
+            } else if ((parseInt(target.offsetWidth) - Math.abs(distance)) <= parseInt(this.contentWrapper.clientWidth)) {
+                this.setLeft(target, -1 * (parseInt(target.offsetWidth) - parseInt(this.contentWrapper.offsetWidth)));
+                return;
+            }
+            this.setLeft(target, distance);
+        }
+    }
+
     private getWheelDelta (evt : any) : number {
         return evt.deltaY > 0 ? -1 : 1
     }
@@ -129,6 +153,10 @@ export class Ng2Scrollster implements OnInit {
         el.style.top = top;
     }
 
+    private setLeft(el, left) : void {
+        el.style.left = left;
+    }
+
     initVerticalScroll () : void {
         let isScrollable;
 
@@ -140,7 +168,6 @@ export class Ng2Scrollster implements OnInit {
             if(!isScrollable) return;
             this.scrollBarV.style.height = barLength;
 
-            this.initContentCSS();
             this.initBarCSS();
             this.initBarDrag();
             this.initScrollables();
@@ -151,17 +178,53 @@ export class Ng2Scrollster implements OnInit {
         let isScrollable;
 
         setTimeout(() => {
-            let barLength = parseInt(this.contentWrapper.clientWidth) /
-                parseFloat(this.scrollableContent.clientWidth) * parseInt(this.contentWrapper.clientWidth);
+            this.scrollableContent.style.width = 'unset';
+
+            let barLength = parseInt(this.contentWrapper.offsetWidth) /
+                parseInt(this.scrollableContent.offsetWidth) * parseInt(this.contentWrapper.offsetWidth);
 
             isScrollable = barLength < this.contentWrapper.clientWidth ? true : false;
 
-            if(!isScrollable) return;
-            this.scrollBarH.style.width = barLength;
+            if(!isScrollable) {
+                this.scrollableContent.style.width = '100%';
+                this.scrollableContent.style.left = '0px';
+                this.scrollBarH.style.width = 'unset';
+                return;
+            }
 
-            this.initContentCSS();
+            this.scrollBarH.style.width = barLength;
+            this.initHBarDrag();
             this.initBarCSS();
         }, 1);
+    }
+
+    private initHBarDrag() : void {
+        let isBarDragging = false,
+            startPosX;
+
+        this.scrollBarH.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isBarDragging = true;
+
+            startPosX = this.scrollBarH.offsetLeft;
+        });
+        window.addEventListener('mousemove', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if(!isBarDragging) return;
+
+            let mouseInnerPosX = e.pageX - this.contentWrapper.offsetLeft;
+            let currentPosX = mouseInnerPosX - .5 * this.scrollBarH.offsetWidth;
+
+
+            this.dragContentH(this.scrollBarH, currentPosX, true);
+            this.dragContentH(this.scrollableContent, -(currentPosX * (this.scrollableContent.clientWidth/this.contentWrapper.clientWidth)), false);
+        })
+        window.addEventListener('mouseup', (e) => {
+            if(!isBarDragging) return;
+            isBarDragging = false;
+        })
     }
 
     private initBarDrag(): void {
@@ -183,18 +246,13 @@ export class Ng2Scrollster implements OnInit {
             let mouseInnerPosY = e.pageY - this.contentWrapper.offsetTop;
             let currentPosY = mouseInnerPosY - .5 * this.scrollBarV.offsetHeight;
 
-            this.dragContent(this.scrollBarV, currentPosY, true);
-            this.dragContent(this.scrollableContent, -(currentPosY * (this.scrollableContent.clientHeight/this.contentWrapper.clientHeight)), false);
+            this.dragContentV(this.scrollBarV, currentPosY, true);
+            this.dragContentV(this.scrollableContent, -(currentPosY * (this.scrollableContent.clientHeight/this.contentWrapper.clientHeight)), false);
         })
         window.addEventListener('mouseup', (e) => {
             if(!isBarDragging) return;
             isBarDragging = false;
         })
-    }
-
-    private initContentCSS() : void {
-        this.contentWrapper.style.paddingRight = this.scrollBarV.offsetWidth;
-        this.contentWrapper.style.paddingBottom = this.scrollBarH.offsetHeight;
     }
 
     private watchScrollableContent() : void {
