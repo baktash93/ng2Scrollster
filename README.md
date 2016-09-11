@@ -1,6 +1,6 @@
 # ng2Scrollster
 
-ng2Scrollster is a lightweight, customizable component for built for use with Angular2 projects which rids you of the default scrollbars of your browsers.
+A lightweight, customizable scroll-bar component built for use with Angular2 projects.
 
 Installation
 -
