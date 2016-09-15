@@ -27,12 +27,12 @@ Usage
 
 To make your content scrollable, supply the `NgScrollster` component into your view as such:
 
-    import {NgScrollster} from 'ng2-scrollster'
+    import {Ng2Scrollster} from 'ng2-scrollster'
     
     @Component({
       ...
       templateUrl: 'your.template.html',
-      directives: [NgScrollster]
+      directives: [Ng2Scrollster]
     })
     
 And, just add `ng-scrollster` as an attribute to the container element.
