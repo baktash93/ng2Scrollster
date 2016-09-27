@@ -54,8 +54,10 @@ export class Ng2Scrollster implements OnInit {
     private contentWrapper;
     private scrollBarV;
     private scrollBarH;
+    private wheelHandler;
 
     ngOnInit() : void {
+        this.initWheelHandler();
         this.init();
     }
 
@@ -139,9 +141,12 @@ export class Ng2Scrollster implements OnInit {
         return evt.deltaY > 0 ? -1 : 1
     }
 
-    private initScrollables () : void {
-        this.contentWrapper.removeEventListener('wheel', this.getWheelHandler());
+    private initWheelScroll () : void {
         this.contentWrapper.addEventListener('wheel', this.getWheelHandler());
+    }
+
+    private resetWheelScroll () : void {
+        this.contentWrapper.removeEventListener('wheel', this.getWheelHandler());
     }
 
     private setContainerHeight () : void {
@@ -162,15 +167,21 @@ export class Ng2Scrollster implements OnInit {
 
         setTimeout(() => {
             let barLength = parseInt(this.contentWrapper.clientHeight) /
-                parseFloat(this.scrollableContent.clientHeight) * parseInt(this.contentWrapper.clientHeight);
-
+                parseInt(this.scrollableContent.clientHeight) * parseInt(this.contentWrapper.clientHeight);
             isScrollable = barLength < this.contentWrapper.clientHeight ? true : false;
-            if(!isScrollable) return;
+
+            if(!isScrollable) {
+                this.resetWheelScroll();
+                this.scrollBarV.style.height = '0px';
+                this.scrollBarV.style.top = '0px';
+                this.scrollableContent.style.top = '0px';
+                return;
+            }
             this.scrollBarV.style.height = barLength;
 
             this.initBarCSS();
             this.initBarDrag();
-            this.initScrollables();
+            this.initWheelScroll();
         }, 1);
     }
 
@@ -276,16 +287,6 @@ export class Ng2Scrollster implements OnInit {
         }, 500);
     }
 
-    private getWheelHandler () : any {
-        let self = this;
-        return function wheelHandler (e) {
-            let delta = self.getWheelDelta(e);
-            let distance = self.SCROLL_DISTANCE;
-            self.scrollContent(self.scrollableContent, delta, distance, false);
-            self.scrollContent(self.scrollBarV, delta, -(distance * (self.contentWrapper.clientHeight/self.scrollableContent.clientHeight)), true);
-        };
-    }
-
     private initBarCSS() : void {
         let options = this.barOptions;
         if(typeof options !== 'object') return;
@@ -294,6 +295,20 @@ export class Ng2Scrollster implements OnInit {
             this.scrollBarV.style[property] = options[property];
             this.scrollBarH.style[property] = options[property];
         }
+    }
+
+    private initWheelHandler () {
+        let self = this;
+        this.wheelHandler = (e) => {
+            let delta = self.getWheelDelta(e);
+            let distance = self.SCROLL_DISTANCE;
+            self.scrollContent(self.scrollableContent, delta, distance, false);
+            self.scrollContent(self.scrollBarV, delta, -(distance * (self.contentWrapper.clientHeight/self.scrollableContent.clientHeight)), true);
+        }
+    }
+
+    private getWheelHandler () : any {
+        return this.wheelHandler;
     }
 
     init () : void {
@@ -308,3 +323,4 @@ export class Ng2Scrollster implements OnInit {
         this.setContainerHeight();
     }
 }
+
