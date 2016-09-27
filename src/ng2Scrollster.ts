@@ -52,12 +52,19 @@ export class Ng2Scrollster implements OnInit {
 
     @Input() barOptions;
 
+    private host;
     private SCROLL_DISTANCE;
     private scrollableContent;
     private contentWrapper;
     private scrollBarV;
     private scrollBarH;
+    private sizeChangeEvent:Event;
     private wheelHandler;
+
+    constructor(private elemRef: ElementRef) {
+        this.host = elemRef.nativeElement;
+        this.sizeChangeEvent = new Event('sizeChange');
+    }
 
     ngOnInit() : void {
         this.initWheelHandler();
@@ -273,19 +280,37 @@ export class Ng2Scrollster implements OnInit {
         let initialHeight = this.scrollableContent.offsetHeight,
             initialWidth = this.scrollableContent.offsetWidth;
         this.contentWrapper.addEventListener('sizeChange', (e) => {
+            this.setContainerHeight();
             this.initVerticalScroll();
             this.initHorizontalScroll();
         });
 
         setInterval(() => {
-            let sizeChangeEvent = new Event('sizeChange');
-            let currentHeight = this.scrollableContent.offsetHeight,
+            let sizeChangeEvent = this.sizeChangeEvent,
+                currentHeight = this.scrollableContent.offsetHeight,
                 currentWidth = this.scrollableContent.offsetWidth;
 
             if(initialHeight !== this.scrollableContent.offsetHeight || initialWidth !== this.scrollableContent.offsetWidth){
                 initialHeight = currentHeight;
                 initialWidth = currentWidth;
                 this.contentWrapper.dispatchEvent(sizeChangeEvent);
+            }
+        }, 500);
+    }
+
+    private watchHostSize () : void {
+        let initialHostHeight = this.host.clientHeight,
+            initialHostWidth = this.host.clientWidth,
+            currentHostHeight,
+            currentHostWidth;
+
+        setInterval(() => {
+            currentHostHeight = this.host.clientHeight;
+            currentHostWidth = this.host.clientWidth;
+            if(initialHostHeight !== currentHostHeight || initialHostWidth !== currentHostWidth){
+                initialHostHeight = currentHostHeight;
+                initialHostWidth = currentHostWidth;
+                this.contentWrapper.dispatchEvent(this.sizeChangeEvent);
             }
         }, 500);
     }
@@ -323,6 +348,7 @@ export class Ng2Scrollster implements OnInit {
         this.initVerticalScroll();
         this.initHorizontalScroll();
         this.watchScrollableContent();
+        this.watchHostSize();
         this.setContainerHeight();
     }
 }
