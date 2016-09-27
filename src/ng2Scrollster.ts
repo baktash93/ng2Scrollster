@@ -12,6 +12,9 @@ import {Component, ViewChild, OnInit, ElementRef, Input} from "@angular/core";
     </div>
     `,
     styles: [`
+        :host {
+            overflow: hidden;
+        }
         .content-wrapper {
             position: relative;
             overflow: hidden;
