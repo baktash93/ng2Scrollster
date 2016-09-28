@@ -190,7 +190,7 @@ export class Ng2Scrollster implements OnInit {
             this.scrollBarV.style.height = barLength;
 
             this.initBarCSS();
-            this.initBarDrag();
+            this.initVBarDrag();
             this.initWheelScroll();
         }, 1);
     }
@@ -221,26 +221,28 @@ export class Ng2Scrollster implements OnInit {
 
     private initHBarDrag() : void {
         let isBarDragging = false,
-            startPosX;
+            startPosX,
+            barOffsetLeft;
 
         this.scrollBarH.addEventListener('mousedown', (e) => {
             e.preventDefault();
             e.stopPropagation();
             isBarDragging = true;
 
-            startPosX = this.scrollBarH.offsetLeft;
+            startPosX = e.pageX - this.contentWrapper.offsetLeft;
+            barOffsetLeft = this.scrollBarH.offsetLeft;
         });
         window.addEventListener('mousemove', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if(!isBarDragging) return;
 
-            let mouseInnerPosX = e.pageX - this.contentWrapper.offsetLeft;
-            let currentPosX = mouseInnerPosX - .5 * this.scrollBarH.offsetWidth;
+            let currentPosX = e.pageX - this.contentWrapper.offsetLeft,
+                mouseMoveDistance = currentPosX - startPosX,
+                barMoveDistance = mouseMoveDistance + barOffsetLeft;
 
-
-            this.dragContentH(this.scrollBarH, currentPosX, true);
-            this.dragContentH(this.scrollableContent, -(currentPosX * (this.scrollableContent.clientWidth/this.contentWrapper.clientWidth)), false);
+            this.dragContentH(this.scrollBarH, barMoveDistance, true);
+            this.dragContentH(this.scrollableContent, -(barMoveDistance * (this.scrollableContent.clientWidth/this.contentWrapper.clientWidth)), false);
         })
         window.addEventListener('mouseup', (e) => {
             if(!isBarDragging) return;
@@ -248,27 +250,30 @@ export class Ng2Scrollster implements OnInit {
         })
     }
 
-    private initBarDrag(): void {
+    private initVBarDrag(): void {
         let isBarDragging = false,
-            startPosY;
+            startPosY,
+            barOffsetTop;
 
         this.scrollBarV.addEventListener('mousedown', (e) => {
             e.preventDefault();
             e.stopPropagation();
             isBarDragging = true;
 
-            startPosY = this.scrollBarV.offsetTop;
+            startPosY = e.pageY - this.contentWrapper.offsetTop;
+            barOffsetTop = this.scrollBarV.offsetTop;
         });
         window.addEventListener('mousemove', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if(!isBarDragging) return;
 
-            let mouseInnerPosY = e.pageY - this.contentWrapper.offsetTop;
-            let currentPosY = mouseInnerPosY - .5 * this.scrollBarV.offsetHeight;
+            let currentPosY = e.pageY - this.contentWrapper.offsetTop,
+                mouseMoveDistance = currentPosY - startPosY,
+                barMoveDistance = mouseMoveDistance + barOffsetTop;
 
-            this.dragContentV(this.scrollBarV, currentPosY, true);
-            this.dragContentV(this.scrollableContent, -(currentPosY * (this.scrollableContent.clientHeight/this.contentWrapper.clientHeight)), false);
+            this.dragContentV(this.scrollBarV, barMoveDistance, true);
+            this.dragContentV(this.scrollableContent, -(barMoveDistance * (this.scrollableContent.clientHeight/this.contentWrapper.clientHeight)), false);
         })
         window.addEventListener('mouseup', (e) => {
             if(!isBarDragging) return;
