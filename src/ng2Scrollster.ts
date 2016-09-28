@@ -328,6 +328,7 @@ export class Ng2Scrollster implements OnInit {
     private initWheelHandler () {
         let self = this;
         this.wheelHandler = (e) => {
+            e.preventDefault();
             let delta = self.getWheelDelta(e);
             let distance = self.SCROLL_DISTANCE;
             self.scrollContent(self.scrollableContent, delta, distance, false);
